@@ -10,10 +10,10 @@ Features
 -  Automates OAuth2.0 into just few lines with flexible settings.
 -  Wraps [PyDrive](https://github.com/googleworkspace/PyDrive). for simple usage
 
-How to install
+Setup
 --------------
 
-Simply clone this repository and install the `requirements.txt`
+Simply clone this repository and install the `requirements.txt`. Follow the instructions [PyDrive](https://github.com/googleworkspace/PyDrive) here to enable Google Cloud APIs and to get credentials
 
 OAuth made easy
 ---------------
