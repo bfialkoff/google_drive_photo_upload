@@ -1,0 +1,9 @@
+.git/
+**/.idea
+**/__pycache__
+unprocessed/*
+
+!unprocessed/example.png
+
+settings/settings.yaml
+settings/credentials.json

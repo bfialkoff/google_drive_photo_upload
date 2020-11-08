@@ -1,0 +1,19 @@
+client_config_backend: settings
+client_config:
+    client_id: <your-client-id-here>
+    client_secret: <your-client-secret-here>
+
+
+save_credentials: True
+save_credentials_backend: file
+save_credentials_file: settings/credentials.json
+
+get_refresh_token: True
+
+oauth_scope:
+    - https://www.googleapis.com/auth/drive
+    - https://www.googleapis.com/auth/drive.install
+
+# to find the id, right click on the folder you wish to upload, select share, the link will be of the form:
+# https://drive.google.com/drive/folders/<root-folder-id-here>?usp=sharing
+photo_store_root: <root-folder-id-here>
