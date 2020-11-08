@@ -42,7 +42,7 @@ if __name__ == '__main__':
 
     # we are going to upload in parallel, we need to create all the directories before that happens,
     #  otherwise there will be duplicates directories, again because id is disntinct not name
-    distinct_dates = set(FileHandler.get_capture_date(f.name) for f in files)
+    distinct_dates = set(FileHandler.get_capture_date(f) for f in files)
 
     for year, month in distinct_dates:
         year_id = g_driver.mk_google_dir(pictures_id, year)

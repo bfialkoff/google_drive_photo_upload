@@ -28,4 +28,10 @@ OAuth2.0 is done in two lines.Simply ownload *client\_secrets.json* from the Goo
 
 Photo ordering made easy
 ---------------
-Simply paste your unordered photos in `unprocessed` and run `main.py`. After completeign authorization the photos will be uploaded into a convenenient folder structure by year and month. 
+Simply paste your unordered photos in `unprocessed` and run `main.py`.  After completeign authorization the photos will be uploaded into a convenenient folder structure by year and month.  
+The photos are assumed either to contain an 8 digit capture date in its file name, otherwise the year 0000 is chose and month 00.
+
+To Do
+-----
+- Try to read EXIF data if date isn't contained in name
+- Create a Telegram bot to handle frontend, and recieve photos straight from mobile device
