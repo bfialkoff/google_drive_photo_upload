@@ -14,7 +14,7 @@ class FileHandler:
         self.file_name = src_file.name
 
         # decode the capture year and month for archiving
-        self.year, self.month = self.get_capture_date(self.file_name)
+        self.year, self.month = self.get_capture_date(src_file)
 
         # for some reason we need rewrite the src image
 

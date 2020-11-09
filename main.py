@@ -5,8 +5,8 @@ from googe_driver import GoogleDriver
 from file_handler import FileHandler
 
 def _file_upload(file_hndlr):
-    year_id = g_driver.find_subfolder_id(pictures_id, year)
-    month_id = g_driver.find_subfolder_id(year_id, month)
+    year_id = g_driver.find_subfolder_id(pictures_id, file_hndlr.year)
+    month_id = g_driver.find_subfolder_id(year_id, file_hndlr.month)
     file_id = g_driver.upload_file(file_hndlr, month_id)
     file_hndlr.cleanup()
     return file_id
@@ -53,8 +53,7 @@ if __name__ == '__main__':
     files_per_worker = 50
 
     worker_file_chunks = list_split(files, files_per_worker)
-
-    # %% Distribute scraping tasks to workers
+    # %% Distribute tasks to workers
     pool = ThreadPool(workers) # Make the Pool of workers
     pool.map(file_upload, worker_file_chunks)
     pool.close() # close the pool and wait for the work to finish

@@ -28,4 +28,5 @@ The photos are assumed either to contain an 8 digit capture date in its file nam
 To Do
 -----
 - Try to read EXIF data if date isn't contained in name
+- Add a progress bar for the ThreadPool
 - Create a Telegram bot to handle frontend, and recieve photos straight from mobile device
