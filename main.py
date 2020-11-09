@@ -1,3 +1,4 @@
+from datetime import datetime
 from pathlib import Path
 from multiprocessing.dummy import Pool as ThreadPool
 
@@ -15,6 +16,8 @@ def file_upload(src_file_list):
     for src_file in src_file_list:
         file_hndlr = FileHandler(src_file)
         file_id = _file_upload(file_hndlr)
+        line = f'{file_id},{src_file.name},completed\n'
+        log_file_fs.write(line)
 
 def list_split(l, split_size):
     whole = len(l) // split_size
@@ -25,11 +28,27 @@ def list_split(l, split_size):
     split_l = [l[s:e] for s,e in split_inds]
     return split_l
 
+def read_completed(log_file_fs):
+    completed = []
+    if log_file.exists():
+        lines = log_file_fs.readlines()
+        completed = [l.split(',')[1] for l in lines[1:]]
+
+    return completed
+
 if __name__ == '__main__':
     project_root = Path(__file__).joinpath('..').resolve()
+    log_file = project_root.joinpath('logs', f"{datetime.today().strftime('%Y%m%d')}.txt")
+    if not log_file.parent.exists():
+        log_file.parent.mkdir(parents=True)
+
+    log_file_fs = open(log_file, 'r+')
+    completed = read_completed(log_file_fs)
 
     # path to the images to be uploaded
-    files = list(project_root.joinpath('unprocessed').resolve().glob('**/*.*'))
+    files = list(project_root.joinpath('my_unprocessed').resolve().glob('**/*.*'))
+
+    files = [f for f in files if f.name not in completed]
 
     #path to settings file
     settings_file = project_root.joinpath('settings', 'settings.yaml')
@@ -59,4 +78,5 @@ if __name__ == '__main__':
     pool.close() # close the pool and wait for the work to finish
     pool.join()
 
+    log_file_fs.close()
 

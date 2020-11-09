@@ -4,7 +4,7 @@
 unprocessed/*
 my_unprocessed/*
 settings/*
-
+logs/*
 !unprocessed/example.png
 !settings/example_settings.yaml
 
