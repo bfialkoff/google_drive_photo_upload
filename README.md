@@ -30,4 +30,5 @@ To Do
 - Try to read EXIF data if date isn't contained in name
 - Add a progress bar for the ThreadPool
 - Improve logging to indicate folde creation and file's upload status
+- Try and fix opening and saving temp image before upload, include mp4s
 - Create a Telegram bot to handle frontend, and recieve photos straight from mobile device
