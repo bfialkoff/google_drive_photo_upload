@@ -2,7 +2,7 @@ from datetime import datetime
 from pathlib import Path
 from multiprocessing.dummy import Pool as ThreadPool
 
-from googe_driver import GoogleDriver
+from google_driver import GoogleDriver
 from file_handler import FileHandler
 
 def _file_upload(file_hndlr):
@@ -42,8 +42,14 @@ if __name__ == '__main__':
     if not log_file.parent.exists():
         log_file.parent.mkdir(parents=True)
 
-    log_file_fs = open(log_file, 'r+')
-    completed = read_completed(log_file_fs)
+    completed = []
+    if log_file.exists():
+        read_mode = 'r+'
+        log_file_fs = open(log_file, read_mode)
+        completed = read_completed(log_file_fs)
+    else:
+        read_mode = 'w'
+        log_file_fs = open(log_file, read_mode)
 
     # path to the images to be uploaded
     files = list(project_root.joinpath('my_unprocessed').resolve().glob('**/*.*'))
@@ -51,7 +57,7 @@ if __name__ == '__main__':
     files = [f for f in files if f.name not in completed]
 
     #path to settings file
-    settings_file = project_root.joinpath('settings', 'settings.yaml')
+    settings_file = project_root.joinpath('settings', 'dev_settings.yaml')
 
     # instantiate a driver to handle all the actual uploading
     g_driver = GoogleDriver(settings_file)

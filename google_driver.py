@@ -10,16 +10,15 @@ class GoogleDriver:
     def get_driver(self, settings_file):
         # handles auth flow
         g_login = GoogleAuth(settings_file)
-
+        auth_url = g_login.GetAuthUrl()
         # Try to load saved client credentials
         g_login.LoadCredentialsFile()
 
         if g_login.credentials is None:
             g_login.GetFlow()
-            g_login.flow.params.update({'access_type': 'offline'})
-            g_login.flow.params.update({'approval_prompt': 'force'})
+            g_login.flow.params.update({'access_type': 'offline', 'approval_prompt': 'force'})
 
-            # Authenticate if they're not there
+            # prompt user to visit url and return code
             g_login.LocalWebserverAuth()
 
         elif g_login.access_token_expired:
