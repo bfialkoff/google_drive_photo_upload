@@ -11,8 +11,8 @@ ExifTags.TAGS
 class FileHandler:
 
     def __init__(self, src_file):
-        self.file_name = src_file.name
-
+        self.file_name = src_file.parent.joinpath(src_file.name)
+        self.name = self.file_name.name
         # decode the capture year and month for archiving
         self.year, self.month = self.get_capture_date(src_file)
 

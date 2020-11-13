@@ -6,8 +6,8 @@ from google_driver import GoogleDriver
 from file_handler import FileHandler
 
 def _file_upload(file_hndlr):
-    year_id = g_driver.find_subfolder_id(pictures_id, file_hndlr.year)
-    month_id = g_driver.find_subfolder_id(year_id, file_hndlr.month)
+    year_id = g_driver.name2id(pictures_id, file_hndlr.year)
+    month_id = g_driver.name2id(year_id, file_hndlr.month)
     file_id = g_driver.upload_file(file_hndlr, month_id)
     file_hndlr.cleanup()
     return file_id

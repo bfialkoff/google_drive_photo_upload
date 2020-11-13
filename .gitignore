@@ -5,6 +5,8 @@ unprocessed/*
 my_unprocessed/*
 settings/*
 logs/*
+user_credentials/
+
 !unprocessed/example.png
 !settings/example_settings.yaml
 
