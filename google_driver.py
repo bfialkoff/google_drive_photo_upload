@@ -1,10 +1,27 @@
+"""
+im trying to move to a model where all my data is stored in the context object and the database
+to this end i need to store and retrieve the content of credentials.json in the db which means
+i need to instantiate my driver with a json and not a path and integrate back into bot and stop saving to disk
+
+"""
 import pickle
+import json
 from pathlib import Path
+
 
 from pydrive.auth import GoogleAuth
 from pydrive.drive import GoogleDrive
 
+from credentials_from_dict import CredentialsFromDict
+
+
 google_folder = 'application/vnd.google-apps.folder'
+
+def load_json(path):
+    j = None
+    with open(path, 'r') as f:
+        j = json.load(f)
+    return j
 
 def save_driver(driver, dir):
     drive_path = dir.joinpath('driver.pkl').resolve()
@@ -19,29 +36,19 @@ def load_driver(dir, settings_file):
     return g_driver
 
 class GoogleDriver:
-    def __init__(self, g_login, auth_code, credentials_file):
-        self.credentials_file =  credentials_file
-        self.driver = self.get_driver(g_login, auth_code, self.credentials_file)
+    def __init__(self, g_login, auth_code=None, credentials=None):
+        self.credentials = credentials
+        self.driver = self.get_driver(g_login, auth_code=auth_code, credentials=self.credentials)
 
 
-    def refresh(self, settings_file):
-        g_login = GoogleAuth(settings_file)
-        g_login.LoadCredentialsFile(credentials_file=self.credentials_file)
-
-        if g_login.access_token_expired:
-            g_login.Refresh()
-        else:
-            g_login.Authorize()
-
-        # Save the current credentials to a file
-        g_login.SaveCredentialsFile(credentials_file=self.credentials_file)
-
-        self.driver = GoogleDrive(g_login)
-
-
-
-    def get_driver(self, g_login, auth_code, credentials_file):
-        g_login.LoadCredentialsFile(credentials_file=credentials_file)
+    def get_driver(self, g_login, auth_code=None, credentials=None):
+        """
+        credentials is a dict of credentials
+        """
+        assert auth_code or credentials
+        if bool(credentials):
+            storage = CredentialsFromDict(content=credentials)
+            g_login.credentials = storage.get()
 
         if g_login.credentials is None:
             g_login.Auth(auth_code)
@@ -50,12 +57,11 @@ class GoogleDriver:
         else:
             g_login.Authorize()
 
-        # Save the current credentials to a file
-        g_login.SaveCredentialsFile(credentials_file=credentials_file)
-
-
         driver = GoogleDrive(g_login)
         return driver
+
+    def get_credentials(self):
+        return json.loads(self.driver.auth.credentials.to_json())
 
     def id2name(self, id):
         q = {'q': f"'root' in parents and trashed=false and mimeType='{google_folder}'"}
@@ -94,10 +100,13 @@ class GoogleDriver:
 
     def upload_file(self, file_handler, dst_id):
         params = {'title': file_handler.name,
-                  #'mimeType': google_photo,
                   'parents': [{'id': dst_id}]}
         file = self.driver.CreateFile(params)
         file.SetContentFile(str(file_handler.file_name))
         file.Upload()
         file_id = file['id']
         return file_id
+
+if __name__ == '__main__':
+    pass
+
