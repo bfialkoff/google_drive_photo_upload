@@ -23,6 +23,13 @@ class MongoDriver:
             return
         self.db.insert_one(user_data)
 
+    def remove_user_data(self, user_id):
+        num_removed = self.db.delete_many({'user_id': user_id})
+        return num_removed
+
+    def update_photo_store_root(self, user_id, new_photo_store_root):
+        self.db.update_one({'user_id': user_id}, {"$set": {"photo_store_root": new_photo_store_root}})
+
 if __name__ == '__main__':
     m_driver = MongoDriver()
     user_data = m_driver.get_user_params(2)

@@ -1,30 +1,21 @@
 """ todo
-i need to work on the flow here
-- try to find a better solution to driver than global
-	 maybe something like driver = GoogleDrive instead of None, and then later driver = driver(g_login) ? 
-- i need settings per user... save_credentials_file, photo_store_root need to be set
-- the whole /start situation is a mess... do this better
-- something for viewing credentials
-- something for modifying credentials
-- something for handling photos
-
-- test upload capabilities
+- something about storage root name
+- something about updating photo root
+- clear auth
 """
 
 from pathlib import Path
 import logging
-import json
 
 from pydrive.auth import GoogleAuth
 
-from telegram import ReplyKeyboardMarkup, ReplyKeyboardRemove, Update
+from telegram import ReplyKeyboardRemove, Update
 from telegram.ext import Updater, CommandHandler, MessageHandler, Filters, ConversationHandler, CallbackContext
 
-# from google_driver import GoogleDriver
 from google_driver import GoogleDriver
 from file_handler import FileHandler
 from settings.telegram_credentials import *
-from mongo_db_test import MongoDriver
+from mongo_driver import MongoDriver
 
 m_driver = MongoDriver()
 
@@ -43,8 +34,23 @@ credentials_dir = project_root.joinpath('user_credentials').resolve()
 logger = logging.getLogger(__name__)
 ACCESS_CODE, PHOTO_STORE_ROOT = 0, 1
 
+def restore_state(user_params: dict, context: CallbackContext) -> CallbackContext:
+    g_login = GoogleAuth(settings_file)
+    g_driver = GoogleDriver(g_login, credentials=user_params['credentials'])
 
+    context.user_data['auth_object'] = g_login
+    context.user_data['driver'] = g_driver
+    context.user_data['photo_store_root'] = user_params['photo_store_root']
+    context.user_data['user_dir'] = Path(user_params['user_dir'])
+    return context
+
+# todo search db for user info do re-auth unless necessary
 def start(update: Update, context: CallbackContext) -> int:
+    user = update.message.from_user
+    user_params = m_driver.get_user_params(user.id)
+    if bool(user_params):
+        return ConversationHandler.END
+
     g_login = GoogleAuth(settings_file)
     context.user_data['auth_object'] = g_login
     auth_url = g_login.GetAuthUrl()
@@ -77,6 +83,30 @@ def access_code(update: Update, context: CallbackContext) -> int:
 
     return PHOTO_STORE_ROOT
 
+def update_photo_root_entry(update: Update, context: CallbackContext):
+    update.message.reply_text(
+        'Send the ID of the google drive folder you want to upload to.\n'
+        'to find the id, simply open the destination folder on your google drive, the url will be of the form:\n'
+        'https://drive.google.com/drive/u/4/folders/<root-folder-id-here>'
+    )
+    return PHOTO_STORE_ROOT
+
+def update_photo_root(update: Update, context: CallbackContext):
+    user = update.message.from_user
+    photo_store_root = update.message.text
+    # validate that id exists, else return PHOTO_STORE_ROOT, maybe confirm using folder name
+
+    context.user_data['photo_store_root'] = photo_store_root
+
+    logger.info("User logged photo store %s.", photo_store_root)
+
+    update.message.reply_text(
+        f"Your photos will now be uploaded to {context.user_data['driver'].id2name(photo_store_root)}\n"
+        , reply_markup=ReplyKeyboardRemove()
+    )
+    m_driver.update_photo_store_root(user.id, photo_store_root)
+    return ConversationHandler.END
+
 
 def photo_store_root(update: Update, context: CallbackContext) -> int:
     user = update.message.from_user
@@ -85,7 +115,7 @@ def photo_store_root(update: Update, context: CallbackContext) -> int:
 
     context.user_data['photo_store_root'] = photo_store_root
 
-    logger.info("User logged photo store %s.", user.photo_store_root)
+    logger.info("User logged photo store %s.", photo_store_root)
 
     update.message.reply_text(
         'Authorization granted.\n'
@@ -115,13 +145,7 @@ def upload_photo(update: Update, context: CallbackContext) -> None:
                 'Auth failed, trying sending /start again.', reply_markup=ReplyKeyboardRemove()
             )
             return ConversationHandler.END
-        g_login = GoogleAuth(settings_file)
-        g_driver = GoogleDriver(g_login, credentials=user_params['credentials'])
-
-        context.user_data['auth_object'] = g_login
-        context.user_data['driver'] = g_driver
-        context.user_data['photo_store_root'] = user_params['photo_store_root']
-        context.user_data['user_dir'] = Path(user_params['user_dir'])
+        context = restore_state(user_params, context)
 
     g_driver = context.user_data['driver']
     file_name = update.message.document.file_name
@@ -156,7 +180,14 @@ def cancel(update: Update, context: CallbackContext) -> int:
     # store user context data in db
     return ConversationHandler.END
 
-
+def delete_user(update, context):
+    user = update.message.from_user
+    m_driver.remove_user_data(user.id)
+    update.message.reply_text(
+        'You have revoked the bot\'s access to your google drive\n'
+        'to continue using this bot send \start\n',
+        reply_markup=ReplyKeyboardRemove()
+    )
 def echo(update, context):
     context.bot.send_message(chat_id=update.effective_chat.id, text=update.message.text)
 
@@ -177,11 +208,25 @@ def main() -> None:
                 PHOTO_STORE_ROOT: [MessageHandler(Filters.text, photo_store_root)]},
         fallbacks=[CommandHandler('cancel', cancel)],
     )
+
+    update_photo_root_handler = ConversationHandler(
+        entry_points=[CommandHandler('update_photo_root', update_photo_root_entry),
+                      #MessageHandler(Filters.text, update_photo_root)
+                      ],
+        states={PHOTO_STORE_ROOT: [MessageHandler(Filters.text, update_photo_root)]},
+        fallbacks=[CommandHandler('cancel', cancel)],
+    )
+
     photo_handler = MessageHandler(Filters.document & (~ Filters.photo), upload_photo)
     echo_handler = MessageHandler(Filters.text & (~Filters.command), echo)
+    delete_user_handler = CommandHandler('delete', delete_user)
+
     dispatcher.add_handler(setup_handler)
+    dispatcher.add_handler(update_photo_root_handler)
     dispatcher.add_handler(photo_handler)
+    dispatcher.add_handler(delete_user_handler)
     dispatcher.add_handler(echo_handler)
+
     # Start the Bot
     updater.start_polling()
 
