@@ -84,6 +84,15 @@ def access_code(update: Update, context: CallbackContext) -> int:
     return PHOTO_STORE_ROOT
 
 def update_photo_root_entry(update: Update, context: CallbackContext):
+    user = update.message.from_user
+    if not bool(context.user_data):
+        user_params = m_driver.get_user_params(user.id)
+        if not bool(user_params):
+            update.message.reply_text(
+                'Auth failed, trying sending /start again.', reply_markup=ReplyKeyboardRemove()
+            )
+            return ConversationHandler.END
+        context = restore_state(user_params, context)
     update.message.reply_text(
         'Send the ID of the google drive folder you want to upload to.\n'
         'to find the id, simply open the destination folder on your google drive, the url will be of the form:\n'
@@ -111,6 +120,12 @@ def update_photo_root(update: Update, context: CallbackContext):
 def photo_store_root(update: Update, context: CallbackContext) -> int:
     user = update.message.from_user
     photo_store_root = update.message.text
+
+    folder_name = context.user_data['driver'].id2name(photo_store_root)
+    if folder_name is None:
+        update.message.reply_text(f'cannot find folder with id {photo_store_root}\n'
+                                  'try again')
+        return PHOTO_STORE_ROOT
     # validate that id exists, else return PHOTO_STORE_ROOT, maybe confirm using folder name
 
     context.user_data['photo_store_root'] = photo_store_root
@@ -119,7 +134,7 @@ def photo_store_root(update: Update, context: CallbackContext) -> int:
 
     update.message.reply_text(
         'Authorization granted.\n'
-        f"Your photos will be uploaded to {context.user_data['driver'].id2name(photo_store_root)}\n"
+        f"Your photos will be uploaded to {folder_name}\n"
         'Note you must send your photos as a File attachment.\n'
         'This ensures the images wont be compressed and that\n'
         'The images can be archived correctly.', reply_markup=ReplyKeyboardRemove()
