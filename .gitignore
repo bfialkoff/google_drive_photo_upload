@@ -11,5 +11,3 @@ settings/settings.yaml
 settings/telegram_credentials.py
 
 Pipfile*
-!unprocessed/example.png
-!settings/settings.yaml
