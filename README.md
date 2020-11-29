@@ -1,7 +1,7 @@
 Auto Photo Upload
 -------
 
-It contains the source code for a telegram bot that can be configured to autmatically upload photos to a google drive account. It uses [PyDrive](https://github.com/googleworkspace/PyDrive), [pymongo](https://github.com/mongodb/mongo-python-driver), and [python-telegram-bot](https://github.com/python-telegram-bot/python-telegram-bot/tree/master/examples).
+This project contains the source code for a telegram bot that can be configured to autmatically upload photos to a google drive account. It uses [PyDrive](https://github.com/googleworkspace/PyDrive), [pymongo](https://github.com/mongodb/mongo-python-driver), and [python-telegram-bot](https://github.com/python-telegram-bot/python-telegram-bot/tree/master/examples).
 
 Setup
 --------------
