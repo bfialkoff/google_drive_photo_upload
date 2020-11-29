@@ -1,0 +1,20 @@
+client_config_backend: settings
+client_config:
+    client_id: 578330744081-02kbhmjl1s2p6t8dln9o62rl35te5o25.apps.googleusercontent.com
+    client_secret: 4UyAdiNUwpoYrvgofNmkE2fH
+
+
+save_credentials: True
+save_credentials_backend: file
+save_credentials_file: settings/credentials.json
+
+get_refresh_token: True
+
+oauth_scope:
+    - https://www.googleapis.com/auth/drive
+    - https://www.googleapis.com/auth/drive.install
+
+photo_store_root: 1bk_TQ6i84YVctN9Aw-nR5gkxKkmb2S8_ # bfialkoff@gmail.com dev-test
+#photo_store_root: 1qCfSbAPVZ2qZoUbKx9gt-JY4ciTU-l3g # saradnselig@gmail.com dev-test
+#photo_store_root: 13ATWg_EyiEJLGenJ5x-VkQwrqpYy2k_K # kunger88@gmail.com dev-test
+#photo_store_root: 1PgCTEXWPDSaFYEKLObR4gg_cgSAKDYhl # kunger88@gmail.com actual dst
