@@ -6,6 +6,7 @@ my_unprocessed/*
 logs/*
 user_credentials/
 
+Pipfile*
 !unprocessed/example.png
 !settings/settings.yaml
 

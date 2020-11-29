@@ -1,3 +1,4 @@
 PyDrive
 python-telegram-bot
 pymongo
+dnspython
