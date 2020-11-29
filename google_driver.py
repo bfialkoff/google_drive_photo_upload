@@ -6,10 +6,7 @@ i need to instantiate my driver with a json and not a path and integrate back in
 """
 import pickle
 import json
-from pathlib import Path
 
-
-from pydrive.auth import GoogleAuth
 from pydrive.drive import GoogleDrive
 
 from credentials_from_dict import CredentialsFromDict

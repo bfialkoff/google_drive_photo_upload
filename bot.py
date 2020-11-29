@@ -251,7 +251,6 @@ def main() -> None:
 
     # Start the Bot
     #updater.start_polling()
-    app_name = 'https://uploadphotobot.herokuapp.com/'
     updater.start_webhook(listen="0.0.0.0",
                           port=5000,
                           url_path=telegram_token)

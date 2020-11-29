@@ -1,10 +1,6 @@
 import pymongo
 
-mongodb_user = 'photo-bot'
-mongodb_password = 'FncQJgTiklYIZBeo'
-cluster_name = 'photo-app'
-mongo_db_name = 'drive_bot'
-collection = 'users'
+from settings.telegram_credentials import *
 
 
 class MongoDriver:
