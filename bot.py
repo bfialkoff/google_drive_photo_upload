@@ -28,6 +28,7 @@ logging.basicConfig(
 
 project_root = Path(__file__).joinpath('..').resolve()
 settings_file = project_root.joinpath('settings', 'dev_settings.yaml')
+folder_id_screenshot_path = project_root.joinpath('settings', 'file_id_screenshot.png').resolve()
 
 credentials_dir = project_root.joinpath('user_credentials').resolve()
 
@@ -49,6 +50,7 @@ def start(update: Update, context: CallbackContext) -> int:
     user = update.message.from_user
     user_params = m_driver.get_user_params(user.id)
     if bool(user_params):
+        update.message.reply_text('already onboarded.')
         return ConversationHandler.END
 
     g_login = GoogleAuth(settings_file)
@@ -78,8 +80,11 @@ def access_code(update: Update, context: CallbackContext) -> int:
     update.message.reply_text(
         'Send the ID of the google drive folder you want to upload to.\n'
         'to find the id, simply open the destination folder on your google drive, the url will be of the form:\n'
-        'https://drive.google.com/drive/u/4/folders/<root-folder-id-here>'
+        'https://drive.google.com/drive/u/4/folders/<root-folder-id-here>\n'
+        'See the picture below.\n'
+
     )
+    update.message.reply_photo(open(folder_id_screenshot_path, 'rb'))
 
     return PHOTO_STORE_ROOT
 
@@ -96,8 +101,11 @@ def update_photo_root_entry(update: Update, context: CallbackContext):
     update.message.reply_text(
         'Send the ID of the google drive folder you want to upload to.\n'
         'to find the id, simply open the destination folder on your google drive, the url will be of the form:\n'
-        'https://drive.google.com/drive/u/4/folders/<root-folder-id-here>'
+        'https://drive.google.com/drive/u/4/folders/<root-folder-id-here>\n'
+        'See the picture below.\n'
+
     )
+    update.message.reply_photo(open(folder_id_screenshot_path, 'rb'))
     return PHOTO_STORE_ROOT
 
 def update_photo_root(update: Update, context: CallbackContext):
@@ -126,7 +134,6 @@ def photo_store_root(update: Update, context: CallbackContext) -> int:
         update.message.reply_text(f'cannot find folder with id {photo_store_root}\n'
                                   'try again')
         return PHOTO_STORE_ROOT
-    # validate that id exists, else return PHOTO_STORE_ROOT, maybe confirm using folder name
 
     context.user_data['photo_store_root'] = photo_store_root
 
@@ -243,7 +250,12 @@ def main() -> None:
     dispatcher.add_handler(echo_handler)
 
     # Start the Bot
-    updater.start_polling()
+    #updater.start_polling()
+    app_name = 'https://uploadphotobot.herokuapp.com/'
+    updater.start_webhook(listen="0.0.0.0",
+                          port=5000,
+                          url_path=telegram_token)
+    updater.bot.set_webhook(app_name + telegram_token)
 
     # Run the bot until you press Ctrl-C or the process receives SIGINT,
     # SIGTERM or SIGABRT. This should be used most of the time, since

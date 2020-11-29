@@ -3,12 +3,11 @@
 **/__pycache__
 unprocessed/*
 my_unprocessed/*
-settings/*
 logs/*
 user_credentials/
 
 !unprocessed/example.png
-!settings/example_settings.yaml
+!settings/settings.yaml
 
 # settings/settings.yaml
 # settings/credentials.json
