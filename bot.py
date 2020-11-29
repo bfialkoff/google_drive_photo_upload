@@ -12,10 +12,10 @@ from pydrive.auth import GoogleAuth
 from telegram import ReplyKeyboardRemove, Update
 from telegram.ext import Updater, CommandHandler, MessageHandler, Filters, ConversationHandler, CallbackContext
 
-from google_driver import GoogleDriver
-from file_handler import FileHandler
-from settings.telegram_credentials import *
-from mongo_driver import MongoDriver
+from utils.google_driver import GoogleDriver
+from utils.file_handler import FileHandler
+from settings.credentials import url_host, telegram_token
+from utils.mongo_driver import MongoDriver
 
 m_driver = MongoDriver()
 
@@ -254,7 +254,7 @@ def main() -> None:
     updater.start_webhook(listen="0.0.0.0",
                           port=int(os.environ.get('PORT', 5000)),
                           url_path=telegram_token)
-    updater.bot.set_webhook(app_name + telegram_token)
+    updater.bot.set_webhook(url_host + telegram_token)
 
     # Run the bot until you press Ctrl-C or the process receives SIGINT,
     # SIGTERM or SIGABRT. This should be used most of the time, since

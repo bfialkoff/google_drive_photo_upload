@@ -9,7 +9,7 @@ import json
 
 from pydrive.drive import GoogleDrive
 
-from credentials_from_dict import CredentialsFromDict
+from utils.credentials_from_dict import CredentialsFromDict
 
 
 google_folder = 'application/vnd.google-apps.folder'
