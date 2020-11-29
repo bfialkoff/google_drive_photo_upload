@@ -3,7 +3,7 @@
 - something about updating photo root
 - clear auth
 """
-
+import os
 from pathlib import Path
 import logging
 
@@ -252,7 +252,7 @@ def main() -> None:
     # Start the Bot
     #updater.start_polling()
     updater.start_webhook(listen="0.0.0.0",
-                          port=5000,
+                          port=int(os.environ.get('PORT', 5000)),
                           url_path=telegram_token)
     updater.bot.set_webhook(app_name + telegram_token)
 
