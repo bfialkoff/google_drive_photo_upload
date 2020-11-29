@@ -7,14 +7,9 @@ client_config:
 save_credentials: True
 save_credentials_backend: file
 save_credentials_file: settings/credentials.json
-#save_credentials_file: settings/b_credentials.json
 
 get_refresh_token: True
 
 oauth_scope:
     - https://www.googleapis.com/auth/drive
     - https://www.googleapis.com/auth/drive.install
-
-#photo_store_root: 1bk_TQ6i84YVctN9Aw-nR5gkxKkmb2S8_ # bfialkoff@gmail.com dev-test
-#photo_store_root: 13ATWg_EyiEJLGenJ5x-VkQwrqpYy2k_K # kunger88@gmail.com dev-test
-photo_store_root: 1PgCTEXWPDSaFYEKLObR4gg_cgSAKDYhl # kunger88@gmail.com actual dst

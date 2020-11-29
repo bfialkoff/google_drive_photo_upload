@@ -6,9 +6,10 @@ my_unprocessed/*
 logs/*
 user_credentials/
 
+settings/credentials.json
+settings/settings.yaml
+settings/telegram_credentials.py
+
 Pipfile*
 !unprocessed/example.png
 !settings/settings.yaml
-
-# settings/settings.yaml
-# settings/credentials.json
