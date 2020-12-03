@@ -16,5 +16,6 @@ Follow the instructions
 To Do
 -----
 - Try to read EXIF data if date isn't contained in file name
+- Move to PyDrive2 for better support, better yet stop using an API wrapper
 - Improve logging to indicate to record actions, file uploads, new users, etc, set up another DB
 - Implement functionality for working with video
