@@ -8,6 +8,6 @@ user_credentials/
 
 settings/credentials.json
 settings/settings.yaml
-settings/credentials.py
+settings/example_credentials.py
 
 Pipfile*

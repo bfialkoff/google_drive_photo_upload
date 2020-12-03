@@ -1,6 +1,6 @@
 import pymongo
 
-from settings.credentials import mongo_db_name, mongodb_password, mongodb_user, collection, cluster_name
+from settings.example_credentials import mongo_db_name, mongodb_password, mongodb_user, collection, cluster_name
 
 
 class MongoDriver:

@@ -1,42 +1,65 @@
-"""
-im trying to move to a model where all my data is stored in the context object and the database
-to this end i need to store and retrieve the content of credentials.json in the db which means
-i need to instantiate my driver with a json and not a path and integrate back into bot and stop saving to disk
-
-"""
-import pickle
+import threading
 import json
 
 from pydrive.drive import GoogleDrive
-
-from utils.credentials_from_dict import CredentialsFromDict
-
+from oauth2client import client
 
 google_folder = 'application/vnd.google-apps.folder'
+google_file = 'application/vnd.google-apps.file'
 
-def load_json(path):
-    j = None
-    with open(path, 'r') as f:
-        j = json.load(f)
-    return j
 
-def save_driver(driver, dir):
-    drive_path = dir.joinpath('driver.pkl').resolve()
-    with open(drive_path, 'wb') as f:
-        pickle.dump(driver, f)
+class CredentialsFromDict(client.Storage):
+    """Store and retrieve a single credential to and from a file."""
 
-def load_driver(dir, settings_file):
-    drive_path = dir.joinpath('driver.pkl').resolve()
-    with open(drive_path, 'rb') as f:
-        g_driver = pickle.load(f)
-    g_driver.refresh(settings_file)
-    return g_driver
+    def __init__(self, filename=None, content=None):
+        super(CredentialsFromDict, self).__init__(lock=threading.Lock())
+        assert bool(filename) ^ bool(content)
+        self._filename = filename
+        self._content = bytes(json.dumps(content), 'utf-8') if content is not None else content
+
+    def locked_get(self):
+        """Retrieve Credential from file.
+
+        Returns:
+            oauth2client.client.Credentials
+
+        Raises:
+            IOError if the file is a symbolic link.
+        """
+        credentials = None
+
+        try:
+            credentials = client.Credentials.new_from_json(self._content)
+            credentials.set_store(self)
+        except ValueError:
+            pass
+
+        return credentials
+
+    def locked_put(self, credentials):
+        """Write Credentials to file.
+
+        Args:
+            credentials: Credentials, the credentials to store.
+
+        Raises:
+            IOError if the file is a symbolic link.
+        """
+        credentials_dict = credentials.to_json()
+
+    def locked_delete(self):
+        """Delete Credentials file.
+
+        Args:
+            credentials: Credentials, the credentials to store.
+        """
+        raise NotImplementedError
+
 
 class GoogleDriver:
     def __init__(self, g_login, auth_code=None, credentials=None):
         self.credentials = credentials
         self.driver = self.get_driver(g_login, auth_code=auth_code, credentials=self.credentials)
-
 
     def get_driver(self, g_login, auth_code=None, credentials=None):
         """
@@ -60,8 +83,18 @@ class GoogleDriver:
     def get_credentials(self):
         return json.loads(self.driver.auth.credentials.to_json())
 
-    def id2name(self, id):
-        q = {'q': f"'root' in parents and trashed=false and mimeType='{google_folder}'"}
+    def id2name(self, folder_name, id):
+        q = {'q': f"title='{folder_name}'"}
+        file_list = self.driver.ListFile(q).GetList()
+        name = None
+        for i, f in enumerate(file_list):
+            if f['id'] == id:
+                name = f['title']
+                break
+        return name
+
+    def id2name_(self, id):
+        q = {'p': f"'root' in parents and trashed=false and (mimeType='{google_folder}' or mimeType='{google_file}')"}
         file_list = self.driver.ListFile(q).GetList()
         name = None
         for i, f in enumerate(file_list):
@@ -104,6 +137,6 @@ class GoogleDriver:
         file_id = file['id']
         return file_id
 
+
 if __name__ == '__main__':
     pass
-
