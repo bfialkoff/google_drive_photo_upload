@@ -19,3 +19,4 @@ To Do
 - Move to PyDrive2 for better support, better yet stop using an API wrapper
 - Improve logging to indicate to record actions, file uploads, new users, etc, set up another DB
 - Implement functionality for working with video
+- Improve batch uploads, one return message per batch
